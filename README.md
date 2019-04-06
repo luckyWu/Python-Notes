@@ -1,2 +1,2 @@
 # Python-Notes
-小笔记
+关于Python的笔记
