@@ -1,5 +1,43 @@
 # Python 笔记
 
+#### PEP8规范
+
+PEP是Python Enhancement Proposal的缩写，通常翻译为“Python增强提案”。每个PEP都是一份为Python社区提供的指导Python往更好的方向发展的技术文档，其中的第8号增强提案（PEP 8）是针对Python语言编订的代码风格指南。尽管我们可以在保证语法没有问题的前提下随意书写Python代码，但是在实际开发中，采用一致的风格书写出可读性强的代码是每个专业的程序员应该做到的事情，也是每个公司的编程规范中会提出的要求，这些在多人协作开发一个项目（团队开发）的时候显得尤为重要。我们可以从Python官方网站的[PEP 8链接](https://www.python.org/dev/peps/pep-0008/)中找到该文档，下面我们对该文档的关键部分做一个简单的总结。
+
+**空格的使用**
+
+1. 使用空格来表示缩进而不要用制表符（Tab）。这一点对习惯了其他编程语言的人来说会觉得不可理喻，因为绝大多数程序员都用Tab来表示缩进，但是要知道Python并没有像C/C++或Java那样的用花括号来构造一个代码块的语法，在Python中分支和循环结构都使用缩进来表示哪些代码属于哪一个层级，鉴于此Python代码对缩进以及缩进宽度的依赖比其他很多语言都强得多。在不同的编辑器中，Tab的宽度可能是2个、4个或8个字符，甚至是其他更离谱的值，用Tab来表示缩进对Python代码来说并不可取。
+2. 和语法相关的每一层缩进都用4个空格来表示。
+3. 每行的字符数不要超过79个字符，如果表达式因太长而占据了多行，除了首行之外的其余各行都应该在正常的缩进宽度上再加上4个空格。
+4. 函数和类的定义，代码前后都要用两个空行进行分隔。
+5. 在同一个类中，各个方法之间应该用一个空行进行分隔。
+6. 二元运算符的左右两侧应该保留一个空格，而且只要一个空格就好。
+
+**标识符命名**
+
+PEP 8倡导用不同的命名风格来命名Python中不同的标识符，以便在阅读代码时能够通过标识符的名称来确定该标识符在Python中扮演了怎样的角色（在这一点上，Python自己的内置模块以及某些第三方模块都做得并不是很好）。
+
+1. 变量、函数和属性应该使用小写字母来拼写，如果有多个单词就使用下划线进行连接。
+2. 类中受保护的实例属性，应该以一个下划线开头。
+3. 类中私有的实例属性，应该以两个下划线开头。
+4. 类和异常的命名，应该每个单词首字母大写。
+5. 模块级别的常量，应该采用全大写字母，如果有多个单词就用下划线进行连接。
+6. 类的实例方法，应该把第一个参数命名为`self`以表示对象自身。
+7. 类的类方法，应该把第一个参数命名为`cls`以表示该类自身。
+
+**表达式和语句**
+
+在Python之禅（可以使用`import this`查看）中有这么一句名言：“There should be one-- and preferably only one --obvious way to do it.”，翻译成中文是“做一件事应该有而且最好只有一种确切的做法”，这句话传达的思想在PEP 8中也是无处不在的。
+
+1. 采用内联形式的否定词，而不要把否定词放在整个表达式的前面。例如`if a is not b`就比`if not a is b`更容易让人理解。
+2. 不要用检查长度的方式来判断字符串、列表等是否为`None`或者没有元素，应该用`if not x`这样的写法来检查它。
+3. 就算`if`分支、`for`循环、`except`异常捕获等中只有一行代码，也不要将代码和`if`、`for`、`except`等写在一起，分开写才会让代码更清晰。
+4. `import`语句总是放在文件开头的地方。
+5. 引入模块的时候，`from math import sqrt`比`import math`更好。
+6. 如果有多个`import`语句，应该将其分为三部分，从上到下分别是Python标准模块、第三方模块和自定义模块，每个部分内部应该按照模块名称的字母表顺序来排列。
+
+----
+
 
 
 **可变/不可变对象**
@@ -36,6 +74,210 @@ print(id(t[2]),t) # 1925640 ('a', 'b', ['e', 'd'])
 ```
 
 ----
+
+`global`和`nonlocal`关键字的作用
+
+`global`：声明或定义全局变量
+
+`nonlocal`：表示将变量声明为外层变量（外层函数的局部变量，而且不能是全局变量） 
+
+python 在访问一个变量时，先要去定位这个变量来源于哪里。 
+python引用变量的顺序如下：
+
+1. 当前作用域局部变量
+2. 外层作用域变量
+3. 当前模块中的全局变量
+4. python内置变量
+
+```
+a = 1
+def fun():
+    print(a) # 先引用
+    a = 2 # 再修改
+fun()
+# 运行报错：UnboundLocalError: local variable 'a' referenced before assignment
+# 根据变量查找顺序，内层没找到a用外层的1，但a已经指定为局部变量，无法用到外部的a，报错，可申明a为全局变量
+global a
+
+```
+
+```
+def outer_fun():
+    a = 1
+    def fun():
+        global  a # a为外层变量
+        print(a) # 输出1
+        a = 2
+    fun()
+outer_fun()
+
+# 报错：NameError: name 'a' is not defined
+
+# 改进
+def outer_fun():
+    a = 1
+    def fun():
+        global  a # a为外层变量
+        a = 1
+        print(a) # 输出1
+        a = 2
+    fun()
+    print(a) #输出1
+outer_fun()
+
+# 在使用 nonlocal a 之前，必须保证外层的确已经定义过 a 了，但是在 global a 的时候，可以允许全局变量中还没有定义过a，可以留在后面定义。比如将 print(a) 之前加上对a的定义，便不会出错
+```
+
+```
+# nonlocal的用法
+def outer_fun():
+    a = 1
+    def fun():
+        nonlocal  a # a为外层变量
+        print(a) # 输出1
+        a = 2
+    fun()
+    print(a) #输出2
+outer_fun()
+```
+
+
+
+
+
+----
+
+#### 时间模块
+
+```
+a = datetime.now()
+print(a, type(a))
+b = a.strftime('%Y-%m-%d')
+print(b, type(b))
+c = datetime.strptime(b, '%Y-%m-%d')
+print(c, type(c))
+delta = ds.timedelta(days=3) 
+print(delta, type(delta))
+d = delta + c
+print(d, type(d))
+
+# 输出结果
+2019-04-07 20:43:35.493005 <class 'datetime.datetime'>
+2019-04-07 <class 'str'>
+2019-04-07 00:00:00 <class 'datetime.datetime'>
+3 days, 0:00:00 <class 'datetime.timedelta'>
+2019-04-10 00:00:00 <class 'datetime.datetime'>
+
+```
+
+```
+#  输入某年某月某日，判断这一天是这一年的第几天
+
+import datetime
+def dayofyear():
+	year = input("请输入年份：")
+	month = input("请输入月份：")
+	day = input("请输入天：")
+	date1 = datetime.date(year=int(year),month=int(month),day=int(day))
+	date2 = datetime.date(year=int(year),month=1,day=1)
+	return (date1 - date2 ).days + 1
+
+print(dayofyear())
+
+#运行结果
+请输入年份：2018
+请输入月份：1
+请输入天：2
+2
+```
+
+---
+
+#### random
+
+random.random()：生成一个 0-1 之间的随机浮点数；
+random.uniform(a, b)：生成[a,b]之间的浮点数；
+random.randint(a, b)：生成[a,b]之间的整数；
+random.randrange(a, b, step)：在指定的集合[a,b)中，以 step 为基数随机取一个数
+
+random.shuffle(alist) :打乱序列
+
+```
+import random
+
+print(random.random())
+print(random.uniform(1, 5))
+print(random.randint(1,10))
+print(random.randrange(1, 10, 2))
+l = [1,2,3,4,5,6]
+print(random.shuffle(l))
+print(l)
+
+# 运行结果
+0.5951348446319553
+3.359478757914984
+10
+3
+None
+[3, 4, 5, 1, 6, 2]
+
+```
+
+----
+
+####python日志
+
+**logging模块的日志级别**
+
+logging模块默认定义了以下几个日志等级，它允许开发人员自定义其他日志级别，但是这是不被推荐的，尤其是在开发供别人使用的库时，因为这会导致日志级别的混乱。
+
+| 日志等级（level） | 描述                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| DEBUG             | 最详细的日志信息，典型应用场景是 问题诊断                    |
+| INFO              | 信息详细程度仅次于DEBUG，通常只记录关键节点信息，用于确认一切都是按照我们预期的那样进行工作 |
+| WARNING           | 当某些不期望的事情发生时记录的信息（如，磁盘可用空间较低），但是此时应用程序还是正常运行的 |
+| ERROR             | 由于一个更严重的问题导致某些功能不能正常运行时记录的信息     |
+| CRITICAL          | 当发生严重错误，导致应用程序不能继续运行时记录的信息         |
+
+**说明：**
+
+- 上面列表中的日志等级是从上到下依次升高的，即：DEBUG < INFO < WARNING < ERROR < CRITICAL，而日志的信息量是依次减少的；
+- 当为某个应用程序指定一个日志级别后，应用程序会记录所有日志级别大于或等于指定日志级别的日志信息，而不是仅仅记录指定级别的日志信息，nginx、php等应用程序以及这里要提高的python的logging模块都是这样的。同样，logging模块也可以指定日志记录器的日志级别，只有级别大于或等于该指定日志级别的日志记录才会被输出，小于该等级的日志记录将会被丢弃。
+
+**logging模块中定义好的可以用于format格式字符串中的字段：**
+
+| 字段/属性名称   | 使用格式            | 描述                                                         |
+| --------------- | ------------------- | ------------------------------------------------------------ |
+| asctime         | %(asctime)s         | 日志事件发生的时间--人类可读时间，如：2003-07-08 16:49:45,896 |
+| created         | %(created)f         | 日志事件发生的时间--时间戳，就是当时调用time.time()函数返回的值 |
+| relativeCreated | %(relativeCreated)d | 日志事件发生的时间相对于logging模块加载时间的相对毫秒数（目前还不知道干嘛用的） |
+| msecs           | %(msecs)d           | 日志事件发生事件的毫秒部分                                   |
+| levelname       | %(levelname)s       | 该日志记录的文字形式的日志级别（'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'） |
+| levelno         | %(levelno)s         | 该日志记录的数字形式的日志级别（10, 20, 30, 40, 50）         |
+| name            | %(name)s            | 所使用的日志器名称，默认是'root'，因为默认使用的是 rootLogger |
+| message         | %(message)s         | 日志记录的文本内容，通过 `msg % args`计算得到的              |
+| pathname        | %(pathname)s        | 调用日志记录函数的源码文件的全路径                           |
+| filename        | %(filename)s        | pathname的文件名部分，包含文件后缀                           |
+| module          | %(module)s          | filename的名称部分，不包含后缀                               |
+
+```
+import logging
+LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT)
+logging.debug("This is a debug log.")
+logging.info("This is a info log.")
+logging.warning("This is a warning log.")
+logging.error("This is a error log.")
+logging.critical("This is a critical log.")
+
+# 生成my.log文件
+2019-04-07 21:37:16,031 - DEBUG - This is a debug log.
+2019-04-07 21:37:16,070 - INFO - This is a info log.
+2019-04-07 21:37:16,071 - WARNING - This is a warning log.
+2019-04-07 21:37:16,071 - ERROR - This is a error log.
+2019-04-07 21:37:16,071 - CRITICAL - This is a critical log.
+
+```
 
 #### 切片
 
@@ -86,6 +328,24 @@ print(y1)
 [['x', 'y', 'x'], ['x', 'x', 'x'], ['x', 'x', 'x']]
 
 #  第一个例子3个引用指向的都是同一个列表，改变其中一个另外几个都会发生改变，若不期望出现这种情况，应该用第二个例子的方法
+```
+
+#### 引用
+
+```
+def extendlist(val, list=[]):
+	list.append(val)
+	return list
+list1 = extendlist(10)
+list2 = extendlist(123, [])
+list3 = extendlist('a')
+print("list1 = %s" %list1, id(list1))
+print("list2 = %s" %list2)
+print("list3 = %s" %list3,id(list3))
+# 输出结果
+list1 = [10, 'a'] 5988872
+list2 = [123]
+list3 = [10, 'a'] 5988872
 ```
 
 
@@ -329,6 +589,41 @@ show1 3
 show2 8
 show1 4
 show2 9
+```
+
+#### 类与对象
+
+```
+class C1:
+    # 类字段
+    number = 100
+
+    def __init__(self, name):
+    	self.name = name
+
+    # 声明一个对象方法
+    def object_func(self):
+        print('对象方法')
+        print(self.name)
+
+    # 声明一个类方法
+    @classmethod
+    def class_func(cls):
+        # 通过cls去使用类的字段
+        print('cls:', cls.number)
+        # 通过cls去创建对象
+        tc = cls()
+        tc.object_func()
+        print('这是一个类方法')
+
+    @staticmethod
+    def static_func():
+        print('这是一个静态方法')
+        
+ # 实例方法只能被实例对象调用，静态方法(由@staticmethod装饰的方法)、类方法(由@classmethod装饰的方法)，可以被类或类的实例对象调用。
+ # 静态方法和类成员方法都可以被类或实例访问
+ # 静态方法无需传入self参数，类成员方法需传入代表本类的cls参数
+ # 静态方法是无法访问实例变量的，而类成员方法也同样无法访问实例变量，但可以访问类变量
 ```
 
 
