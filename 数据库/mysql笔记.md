@@ -31,7 +31,55 @@ RDBMS 即关系数据库管理系统(Relational Database Management System)的�
 mysql默认的事务隔离级别为repeatable-read 
 
 ```
+mysql> select @@transaction_isolation;
++-------------------------+
+| @@transaction_isolation |
++-------------------------+
+| REPEATABLE-READ         |
++-------------------------+
+1 row in set (0.00 sec)
+```
 
+修改事务隔离级别
+
+```
+mysql> set session transaction isolation level read uncommitted;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> select @@transaction_isolation;
++-------------------------+
+| @@transaction_isolation |
++-------------------------+
+| READ-UNCOMMITTED        |
++-------------------------+
+1 row in set (0.00 sec)
+```
+
+ 
+
+**查看mysql默认引擎和mysql版本**
+
+```
+
+mysql> show variables like '%storage_engine%';
++----------------------------------+-----------+
+| Variable_name                    | Value     |
++----------------------------------+-----------+
+| default_storage_engine           | InnoDB    |
+| default_tmp_storage_engine       | InnoDB    |
+| disabled_storage_engines         |           |
+| internal_tmp_disk_storage_engine | InnoDB    |
+| internal_tmp_mem_storage_engine  | TempTable |
++----------------------------------+-----------+
+5 rows in set, 1 warning (0.01 sec)
+
+mysql> select version();
++-----------+
+| version() |
++-----------+
+| 8.0.12    |
++-----------+
+1 row in set (0.00 sec)
 ```
 
 
@@ -52,166 +100,180 @@ flush privileges;让权限立即生效
 
 
 
-**mysql 不区分大小写**
+####SQL练习
+
+**创建部门和员工表并插入数据**
 
 ```
-create database temp default charset 'utf8'; --设置默认字符
+drop database if exists temp;
 
+-- 创建数据库并设置默认字符
+create database temp default charset 'utf8';
+
+-- 使用数据库
+use temp;
+
+-- 部门表
 create table TbDept
-
 (
-
-	dno int not null, --"部门编号"
-
-	dname varchar(20) not null， -- "部门名称"
-
-	dloc varchar(20) not null --"部门所在地"
-
+	dno tinyint not null comment "部门编号",
+	dname varchar(20) not null comment "部门名称",
+	dloc varchar(20) not null comment "部门所在地",
 	primary key(dno)
-
 );
 
-```
-
-**创建员工表**
-
-```
+-- 员工表
 create table TbEmp
-
 (
-	eno int not null ,-- '员工编号',
-	ename varchar(20) not null ,-- '员工姓名',
-	job varchar(20) not null,-- '员工职位',
-	mgr int ,--'主管编号',
-	sal int not null ,-- '月薪',
-	comm int ,-- '月补贴',
-	dno tinyint ,-- '所在部门编号',
+	eno int not null comment '员工编号',
+	ename varchar(20) not null comment '员工姓名',
+	job varchar(20) not null comment '员工职位',
+	mgr int comment '主管编号',
+	sal int not null comment '月薪',
+	comm int comment '月补贴',
+	dno tinyint comment '所在部门编号',
+	foreign key(dno) references TbDept(dno),
 	primary key (eno)
-
 );
 
-```
+-- 使用alter添加外键约束
+-- alter table TbEmp add constraint f_dno foreign key(dno) references TbDept(dno);
 
+-- 添加部门数据
+insert into TbDept (dno, dname, dloc) values 
+(10, '总部', '北京'),
+(11, '指挥部', '重庆'),
+(12, '战斗部', '成都');
 
-
-**添加外键约束**
-
-```
-alter table TbEmp add constraint fk_dno foreign key(eno) references TbDept(dno) ；
-```
-
-
-
-**添加员工**
-
-```
-insert into TbEmp values (7800, '张三丰', '总裁', null, 9000, 1200, 20);
-insert into TbEmp values (2056, '乔峰', '分析师', 7800, 5000, 1500, 20);
-insert into TbEmp values (3088, '李莫愁', '设计师', 2056, 3500, 800, 20);
-```
-
-
-
-**添加部门**
+-- 添加部门人员
+insert into TbEmp values (7800, '刘备', '总裁', null, 9000, 1200, 10);
+insert into TbEmp values (2056, '张飞', '将军', 7800, 5000, 1500, 12);
+insert into TbEmp values (3088, '诸葛亮', '军师', 7800, 3500, 800, 11);
+insert into TbEmp values (7801, '曹操', '副总裁', 7800, 8000, 1200, 10);
+insert into TbEmp values (2056, '夏侯谆', '将军', 7801, 5000, 1500, 12);
+insert into TbEmp values (3088, '许攸', '军师', 7801, 3500, 800, 11);
 
 ```
-insert into TbDept values (10, '会计部', '北京');
-insert into TbDept values (20, '研发部', '成都');
-insert into TbDept values (30, '销售部', '重庆');
-```
 
 
 
+* 查询薪资最高的员工姓名和工资
 
+  ```
+  mysql> select ename, sal from Tbemp where sal = (select max(sal) from Tbemp);
+  +--------+------+
+  | ename  | sal  |
+  +--------+------+
+  | 刘备   | 9000 |
+  +--------+------+
+  1 row in set (0.00 sec)
+  ```
 
--- 查询薪资最高的员工姓名和工资
+* 查询员工的姓名和年薪((月薪+补贴)*12)*
 
-select ename, sal from Tbemp where sal = (select max(sal) from Tbemp);
-
-------------
-
-
-
--- 查询员工的姓名和年薪((月薪+补贴)*12)*
-
-*select ename, (sal+comm)*12 from Tbemp;
-
-
-
-![12](img/20190224180004.png)
-
-![12](img/20190224180631.png)
-
-----------
-
-
-
-
-
--- 查询所有员工的部门的编号和人数
-select dno, count(dno) as total  from TbEmp group by dno;
-
-![12](img/20190224181333.png)
-
-------------
+  ```
+  mysql> select ename, (sal+comm)*12 as salary from Tbemp;
+  +-----------+--------+
+  | ename     | salary |
+  +-----------+--------+
+  | 张飞      |  78000 |
+  | 夏侯谆    |  78000 |
+  | 诸葛亮    |  51600 |
+  | 许攸      |  51600 |
+  | 刘备      | 122400 |
+  | 曹操      | 110400 |
+  +-----------+--------+
+  6 rows in set (0.00 sec)
+  ```
 
 
 
+* 查询所有员工的部门的编号、名称和人数
 
+  ```
+  mysql> select t2.dno, dname, total from tbdept t2 inner join 
+  (select dno, count(dno) as total from TbEmp group by dno) t1 on t1.dno=t2.dno;
+  +-----+-----------+-------+
+  | dno | dname     | total |
+  +-----+-----------+-------+
+  |  10 | 总部      |     2 |
+  |  11 | 指挥部    |     2 |
+  |  12 | 战斗部    |     2 |
+  +-----+-----------+-------+
+  3 rows in set (0.00 sec)
+  
+  ```
 
--- 查询所有部门的名称和人数
-select dname, total from tbdept t2, (select dno, count(dno) as total  from TbEmp group by dno) t1 where t2.dno=t1.dno ;
-select dname, total from tbdept t2 inner join (select dno, count(dno) as total  from TbEmp group by dno) t1 on t2.dno=t1.dno;
+  
 
-![12](img/20190224191303.png)
+* 查询薪资最高的姓名和工资（除开老板）
 
------------------
+  ```
+  
+  mysql> select ename, sal from tbemp
+  where sal=(select max(sal) from tbemp where mgr is not null);
+  
+  +--------+------+
+  | ename  | sal  |
+  +--------+------+
+  | 曹操   | 8000 |
+  +--------+------+
+  1 row in set (0.09 sec)
+  ```
 
+  
 
+* 查询薪水超过其所在部门平均薪水的员工的姓名、部门编号和工资
 
----- 查询薪资最高的姓名和工资
-select ename, sal from tbemp
-where sal=(select max(sal) from tbemp where mgr is not null);
+  ```
+  mysql> select ename, t1.dno, sal from tbemp t1 inner join 
+  (select dno, avg(sal) as ave from TbEmp group by dno) t2 
+  on t1.dno=t2.dno and t1.sal>ave;
+  +--------+------+------+
+  | ename  | dno  | sal  |
+  +--------+------+------+
+  | 刘备   |   10 | 9000 |
+  +--------+------+------+
+  1 row in set (0.00 sec)
+  ```
 
-![12](img/20190224192022.png)
+  
 
---------------
+* 查询薪水超过其所在部门平均薪水的员工的姓名、部门名称和工资
 
+  ```
+  mysql> select ename, t2.dname,sal from tbemp t1
+  inner join tbdept t2 on t2.dno=t1.dno
+  inner join (select dno, avg(sal) as ave from TbEmp group by dno) t3 on
+  t3.dno=t2.dno and t1.sal>t3.ave;
+  +--------+--------+------+
+  | ename  | dname  | sal  |
+  +--------+--------+------+
+  | 刘备   | 总部   | 9000 |
+  +--------+--------+------+
+  1 row in set (0.00 sec)
+  ```
 
+  
 
--- 查询薪水超过其所在部门平均薪水的员工的姓名、部门编号和工资
-select ename, t1.dno, sal from tbemp t1,
-(select dno, avg(sal) as ave from TbEmp group by dno) t2 where t1.dno=t2.dno and t1.sal>t2.ave;
+* 查询部门中薪水最高的人姓名、工资和所在部门名称
 
-select ename, t1.dno,sal from tbemp t1 inner join 
-(select dno, avg(sal) as ave from TbEmp group by dno) t2 on t1.dno=t2.dno and t1.sal>t2.ave;
+  ```
+  
+  mysql> select ename, dname, sal from tbemp t1 
+  inner join tbdept t2 on t1.dno=t2.dno 
+  inner join (select dno, max(sal) as maxs from TbEmp group by dno) t3 
+  on t3.dno=t2.dno and t1.sal=t3.maxs;
+  +-----------+-----------+------+
+  | ename     | dname     | sal  |
+  +-----------+-----------+------+
+  | 张飞      | 战斗部    | 5000 |
+  | 夏侯谆    | 战斗部    | 5000 |
+  | 诸葛亮    | 指挥部    | 3500 |
+  | 许攸      | 指挥部    | 3500 |
+  | 刘备      | 总部      | 9000 |
+  +-----------+-----------+------+
+  5 rows in set (0.00 sec)
+  ```
 
-
-
-![12](img/20190224194052.png)
-
------------------
-
-
-
--- 查询薪水超过其所在部门平均薪水的员工的姓名、部门名称和工资
-select ename, t2.dname,sal from tbemp t1, tbdept t2,
-(select dno, avg(sal) as ave from TbEmp group by dno) t3
-where t3.dno=t2.dno and t1.sal>t3.ave and t1.dno=t2.dno;
-
-select ename, t2.dname,sal from tbemp t1 inner join  tbdept t2 on t2.dno=t1.dno
-inner join (select dno, avg(sal) as ave from TbEmp group by dno) t3 on
-t3.dno=t2.dno and t1.sal>t3.ave;
-
-![12](img/20190224195303.png)
-
----------------
-
-
-
--- 查询部门中薪水最高的人姓名、工资和所在部门名称
-select ename, t2.dname,sal from tbemp t1 inner join tbdept t2 on t2.dno=t1.dno
-inner join (select dno, max(sal) as maxs from TbEmp group by dno) t3 on t3.dno=t2.dno and t1.sal=t3.maxs;
-
-![12](img/20190224195823.png)
-
+  
