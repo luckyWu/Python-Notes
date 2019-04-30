@@ -143,9 +143,106 @@ outer_fun()
 
 
 
+---
+
+
+
+**isinstance和type**
+
+type()不会认为子类是一种父类类型
+
+isinstance()会认为子类是一种父类类型
+
+```
+class A():
+	pass
+class W(A):
+	pass
+w = W()
+print(type(w) == A)
+print(isinstance(w, A))
+
+# False
+# True
+
+```
+
 
 
 ----
+
+**is 和 ==**
+
+==是[python标准操作符](https://www.iplaypy.com/jichu/symbol.html)中的比较操作符，用来比较判断两个对象的value(值)是否相等 
+
+is也被叫做同一性运算符，这个运算符比较判断的是对象间的唯一身份标识，也就是id是否相同 
+
+```
+a = '123'
+b = '123'
+c = [1, 2, 3]
+d = [1, 2, 3]
+print(a is b)
+print(a == b)
+print(d is c)
+print(c == d)
+
+-------------------------
+True
+True
+False
+True
+```
+
+备注：c和d的值一样，地址不一样，可用http://www.pythontutor.com可视化执行
+
+![](img/20190430202350.png)
+
+
+
+----
+
+#### Python高阶函数
+
+**filter**
+
+**filter()** 函数用于过滤序列，过滤掉不符合条件的元素，返回由符合条件元素组成的新列表 
+
+```
+def is_odd(n):
+    return n % 2 == 1
+ 
+newlist = filter(is_odd, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+print(newlist)
+```
+
+**map()** 会根据提供的函数对指定序列做映射。
+
+第一个参数 function 以参数序列中的每一个元素调用 function 函数，返回包含每次 function 函数返回值的新列表
+
+```
+m1 = list(map(lambda x: x ** 2, [1, 2, 3, 4, 5]) )
+m = list(map(lambda x, y: x + y, [1, 3, 5, 7, 9], [2, 4, 6, 8, 10]))
+print(m, m1)
+
+[3, 7, 11, 15, 19] [1, 4, 9, 16, 25]
+```
+
+**reduce**
+
+**reduce()** 函数会对参数序列中元素进行累积。
+
+函数将一个数据集合（链表，元组等）中的所有数据进行下列操作：用传给 reduce 中的函数 function（有两个参数）先对集合中的第 1、2 个元素进行操作，得到的结果再与第三个数据用 function 函数运算，最后得到一个结果
+
+```
+from functools import reduce
+s = reduce(lambda x, y: x+y , [1,2,4,5,3])
+print(s)
+
+#15
+```
+
+
 
 #### 时间模块
 
@@ -838,5 +935,24 @@ Thread-9 : -----还书----- 7
 Thread-7 : -----还书----- 5
 Thread-2 : 图书馆总数------------- 0 借书 30
 Thread-1 : -----还书----- 
+```
+
+#### 元类
+
+**metaclass**
+
+除了使用`type()`动态创建类以外，要控制类的创建行为，还可以使用metaclass
+
+```
+class F(type):
+	def __new__(cls, name, bases, attrs):
+		attrs['add'] = 1
+		return type.__new__(cls, name, bases, attrs)
+
+class M(metaclass=F):
+	pass
+
+a = M()
+print(a.add)
 ```
 
