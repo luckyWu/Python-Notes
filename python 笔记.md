@@ -127,6 +127,32 @@ print(a.items() & b.items())
 
 ----
 
+**OS**
+
+```
+import os
+
+s = (os.path.abspath('w.py'))
+# print(os.path.dirname('w.py'))
+print(os.path.join('s:',s, 'r'))
+# 第一个绝对路径之前的参数将被忽略
+os.mkdir('jun')
+if os.path.exists('jun'):
+	os.rmdir('jun')
+
+print(os.getcwd())
+# 1
+print(os.listdir('my_note'))
+print(os.path.getsize('w.py')) # 字节
+```
+
+```
+C:\Users\Administrator\Desktop\w.py\r
+C:\Users\Administrator\Desktop
+['.git', 'pythonWork']
+313
+```
+
 
 
 
