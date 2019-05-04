@@ -36,7 +36,98 @@ PEP 8倡导用不同的命名风格来命名Python中不同的标识符，以便
 5. 引入模块的时候，`from math import sqrt`比`import math`更好。
 6. 如果有多个`import`语句，应该将其分为三部分，从上到下分别是Python标准模块、第三方模块和自定义模块，每个部分内部应该按照模块名称的字母表顺序来排列。
 
+**heapq(https://docs.python.org/2/library/heapq.html#module-heapq) — Heap queue algorithm**
+
+该模块提供了堆队列算法的实现，也称为优先级队列算法 
+
+```
+"""
+从列表中找出最大的或最小的N个元素
+"""
+import heapq
+
+list1 = [34, 25, 12, 99, 87, 63, 58, 78, 88, 92]
+list2 = [
+    {'name': 'IBM', 'shares': 100, 'price': 91.1},
+    {'name': 'AAPL', 'shares': 50, 'price': 543.22},
+    {'name': 'FB', 'shares': 200, 'price': 21.09},
+    {'name': 'HPQ', 'shares': 35, 'price': 31.75},
+    {'name': 'YHOO', 'shares': 45, 'price': 16.35},
+    {'name': 'ACME', 'shares': 75, 'price': 115.65}
+]
+print(heapq.nlargest(3, list1))
+print(heapq.nsmallest(3, list1))
+print(heapq.nlargest(3, list2, key=lambda x: x['shares']))
+print(heapq.nsmallest(3, list2, key=lambda x: x['price']))
+```
+
 ----
+
+**Counter统计次数最多的元素**
+
+```
+"""
+找出序列中出现次数最多的元素
+"""
+
+from collections import Counter
+
+l = [1, 22, 33, 22, 12, 1, 1, 33]
+c = Counter(l)
+print(c.most_common(3))
+
+#
+[(1, 3), (22, 2), (33, 2)]
+```
+
+----
+
+**字典的运算**
+
+```
+# zip() 函数用于将可迭代的对象作为参数，将对象中对应的元素打包成一个个元组，然后返回由这些元组组成的列表
+# z = zip([1,2,3],['a','b'])
+# print(list(z)) -->[(1, 'a'), (2, 'b')]
+
+prices = {
+'ACME': 45.23,
+'AAPL': 612.78,
+'IBM': 205.55,
+'HPQ': 37.20,
+'FB': 10.75
+}
+
+m = max(zip(prices.values(), prices.keys()))
+print(m)
+m1 = sorted(zip(prices.values(), prices.keys()))
+print(m1)
+
+# 查找字典中相同的地方
+a = {
+'x' : 1,
+'y' : 2,
+'z' : 3
+}
+
+b = {
+'w' : 10,
+'x' : 11,
+'y' : 2
+}
+
+print(a.keys() & b.keys())
+print(a.items() & b.items())
+
+# 输出
+(612.78, 'AAPL')
+[(10.75, 'FB'), (37.2, 'HPQ'), (45.23, 'ACME'), (205.55, 'IBM'), (612.78, 'AAPL')]
+{'x', 'y'}
+{('y', 2)}
+```
+
+----
+
+
 
 
 
