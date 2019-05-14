@@ -32,5 +32,25 @@ def quick_sort(l, start, end):
 	return l
 
 
-print(quick_sort(l, 0, len(l)-1))
+# print(quick_sort(l, 0, len(l)-1))
+
+def qp(items, start, end):
+	s, e = start, end
+	if s < e:
+		key = items[s]
+		while(s<e):
+			while (s<e and key<=items[e]):
+				e -= 1
+			items[s], items[e] = items[e], items[s]
+			while (s<e and key>=items[s]):
+				s += 1
+			items[s], items[e] = items[e], items[s]
+		qp(items, start, s-1)
+		qp(items, s+1, end)
+
+	return items
+
+print(qp([1,1,10,2,4],0,4))
+
+
 

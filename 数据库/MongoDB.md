@@ -50,6 +50,50 @@ WriteResult({ "nRemoved" : 1})           # 删除了1条数据
 
 
 
+**MongoDB 更新文档**
+
+```
+> db.my.find()
+{ "_id" : ObjectId("5cb3250b431662cfb08fe367"), "name" : "wu" }
+> db.my.update({'name':'wu'},{$set:{'name':'wuminjun'}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.my.find()
+{ "_id" : ObjectId("5cb3250b431662cfb08fe367"), "name" : "wuminjun" }
+```
+
+####Mongodb查询
+
+**MongoDB 与 RDBMS Where 语句比较**
+
+如果你熟悉常规的 SQL 数据，通过下表可以更好的理解 MongoDB 的条件语句查询：
+
+| 操作       | 格式                     | 范例                                        | RDBMS中的类似语句       |
+| ---------- | ------------------------ | ------------------------------------------- | ----------------------- |
+| 等于       | `{<key>:<value>`}        | `db.col.find({"by":"菜鸟教程"}).pretty()`   | `where by = '菜鸟教程'` |
+| 小于       | `{<key>:{$lt:<value>}}`  | `db.col.find({"likes":{$lt:50}}).pretty()`  | `where likes < 50`      |
+| 小于或等于 | `{<key>:{$lte:<value>}}` | `db.col.find({"likes":{$lte:50}}).pretty()` | `where likes <= 50`     |
+| 大于       | `{<key>:{$gt:<value>}}`  | `db.col.find({"likes":{$gt:50}}).pretty()`  | `where likes > 50`      |
+| 大于或等于 | `{<key>:{$gte:<value>}}` | `db.col.find({"likes":{$gte:50}}).pretty()` | `where likes >= 50`     |
+| 不等于     | `{<key>:{$ne:<value>}}`  | `db.col.find({"likes":{$ne:50}}).pretty()`  | `where likes != 50`     |
+
+**OR**
+
+```
+> db.anjuke.find({ $or:[{'price':'4500'},{'price':'3500'}]})
+{ "_id" : ObjectId("5c9146edc2172921569d4d44"), "title" : "6号线濠装上下两层 自带健身房游泳馆 随时看随时入住不能错过", "img_url" : "https://pic1.ajkimg.com/display/hj/0273f1a7938abc03940ad530199441f0/240x180m.jpg?t=1", "addr" : ",碧森里,海淀-田村 田村北路", "info" : "\n                            1室2厅", "price" : "4500" }
+{ "_id" : ObjectId("5c9146eec2172921569d4d5a"), "title" : "专业代理一方国际楼盘 等各大高档楼盘 1.2.3.室均有", "img_url" : "https://pic1.ajkimg.com/display/hj/98631d1e3739e9bca19b9aaa3687a7bb/240x180m.jpg?t=1", "addr" : ",一方国际广场,中山-中山友好 安乐街29", "info" : "\n                            1室1厅", "price" : "3500" }
+{ "_id" : ObjectId("5c9146eec2172921569d4d5b"), "title" : "中心裕景专业代理1室2室3室欧式风格多套房源", "i
+```
+
+**sort()**
+
+```
+> db.anjuke.find().skip(1000).sort({'price':1}).limit(3)
+{ "_id" : ObjectId("5c91473ac2172921569d5459"), "title" : "火车站 红星巷银静花园2室2厅 家具家电齐全 拎包入住 租房", "img_url" : "https://pic1.ajkimg.com/display/hj/656dd1aaeaacb005042e9db5e31c15b4/240x180m.jpg?t=1", "addr" : ",银静花园,城关-火车站 火车站南路20-52号", "info" : "\n                            2室2厅", "price" : "1800" }
+{ "_id" : ObjectId("5c91473dc2172921569d5473"), "title" : "四季青！婺江地铁站！汽车南站附近望江新园主卧带阳台出租！", "img_url" : "https://pic1.ajkimg.com/display/hj/2e25865e0e7e82e062391b528c24561b/240x180m.jpg?t=1", "addr" : ",望江新园一园,上城-城站 映霞街81号", "info" : "\n                            3室1厅", "price" : "1800" }
+{ "_id" : ObjectId("5c91473ec2172921569d5482"), "title" : "出租 安宁 荣安居 两室 带简单家具 1800  干净整洁", "img_url" : "https://pic1.ajkimg.com/display/hj/1db8ce82a6827861679f14b3085336e8/240x180m.jpg?t=1", "addr" : ",荣安居小区,安宁-莫高大道 建安西路789", "info" : "\n                            2室2厅", "price" : "1800" }
+```
+
 
 
 **MongoDB Limit与Skip方法**

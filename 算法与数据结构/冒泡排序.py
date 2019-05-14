@@ -27,3 +27,15 @@ s = Bubble_sort1([1,2,23,4563,23])
 print(s)
 
 
+def mp(items):
+	n = len(items)
+	for i in range(n-1):
+		swap = False
+		for j in range(n-i-1):
+			if items[j] > items[j+1]:
+				items[j+1], items[j] = items[j], items[j+1]
+				swap = True
+		if not swap:
+			break
+	return items
+print(mp([1,3,2,11,2,4,88,4]))

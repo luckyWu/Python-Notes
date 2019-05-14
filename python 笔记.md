@@ -190,7 +190,11 @@ print(id(t[2]),t) # 1925640 ('a', 'b', ['e', 'd'])
 # 这里的不变指的是指向不变，并不是内容不变
 ```
 
+
+
 ----
+
+
 
 `global`和`nonlocal`关键字的作用
 
@@ -331,6 +335,8 @@ def is_odd(n):
  
 newlist = filter(is_odd, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 print(newlist)
+
+# [1, 3, 5, 7, 9]
 ```
 
 **map()** 会根据提供的函数对指定序列做映射。
@@ -1071,5 +1077,25 @@ class M(metaclass=F):
 
 a = M()
 print(a.add)
+```
+
+**异步**
+
+异步IO。当代码需要执行一个耗时的IO操作时，它只发出IO指令，并不等待IO结果，然后就去执行其他代码了。一段时间后，当IO返回结果时，再通知CPU进行处理 
+
+```
+import asyncio
+import aiohttp
+
+
+async def hello():
+	async with aiohttp.ClientSession() as session:
+	    async with session.get('https://api.github.com/events') as resp:
+	        print(resp.status)
+	        print(await resp.text())
+
+
+loop = asyncio.get_event_loop() 
+loop.run_until_complete(hello())
 ```
 
